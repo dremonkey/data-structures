@@ -39,7 +39,7 @@ describe("hashTable", function() {
     expect(hashTable.retrieve(v1)).to.equal(v1);
     expect(hashTable.retrieve(v2)).to.equal(v2);
   });
-  
+
   // (Extra credit! Remove the extra 'x' when you want the following tests to run)
   xit("should double in size when needed", function() {
     for (var i = 0; i < people.length; i++){
@@ -56,7 +56,7 @@ describe("hashTable", function() {
     }
     expect(hashTable._limit).to.equal(16);
     hashTable.remove("George");
-    hashTable.remove("Dr."); 
+    hashTable.remove("Dr.");
     hashTable.remove("Steven");
     hashTable.remove("John");
     hashTable.remove("Mr.");
