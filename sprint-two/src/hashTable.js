@@ -1,21 +1,66 @@
-var HashTable = function(){
-  this._limit = 8;
+var HashTable = function(limit){
+  this._limit = limit || 8;
   this._storage = makeLimitedArray(this._limit);
+  this._size = 0;
 };
 
 HashTable.prototype.insert = function(k, v){
   var i = getIndexBelowMaxForKey(k, this._limit);
-  this._storage.set(i, v);
+
+  var value = this._storage.get(i) || [];
+  value.push([k,v]);
+  this._storage.set(i, value);
+  this._size++;
+
+  if (this._size >= 0.75*this._limit) {
+    this.resize(true);
+  }
 };
 
 HashTable.prototype.retrieve = function(k){
   var i = getIndexBelowMaxForKey(k, this._limit);
-  return this._storage.get(i);
+
+  var value;
+  var values = this._storage.get(i);
+
+  if (values) {
+    if (values.length > 1) {
+      for(var count=0;count<values.length;count++) {
+        if (k === values[count][0]) value = values[count];
+      }
+    } else {
+      console.log(values[0]);
+      if (k === values[0][0]) {
+        value = values[0];
+      }
+    }
+  }
+
+  return value && value[1] || null;
 };
 
 HashTable.prototype.remove = function(k){
   var i = getIndexBelowMaxForKey(k, this._limit);
-  this._storage.set(i, null);
+
+  var values = this._storage.get(i);
+
+  if (values) {
+    if (values.length > 1) {
+      for (var count=values.length-1; count>=0;count--) {
+        if (k===values[count][0]) {
+          values.splice(count,1);
+        }
+      }
+    } else {
+      this._storage.set(i, null);
+    }
+  }
+
+  this._size--;
+
+  if (this._size < 0.25*this._limit) {
+    this.resize(false);
+  }
 };
 
 HashTable.prototype.resize = function (makeLarger) {
@@ -23,10 +68,35 @@ HashTable.prototype.resize = function (makeLarger) {
   //  if size > 75%, double the size.
   //  if size < 25%, half the size
 
-  // if makeLarger
-  //  create new hashtable, doubled in size
-  //  map old values to new keys
-  // else if makeSmaller
-  //  create new hashtable, half size
-  //  map old values to new keys
+  var oldStorage = this._storage;
+  var limit;
+  var newStorage;
+
+  // fix for changes in storage structure
+  if (makeLarger) {
+    limit = this._limit*2;
+    newStorage = makeLimitedArray(limit);
+
+    oldStorage.each(function (val) {
+      if (val) {
+        var i = getIndexBelowMaxForKey(val[0],limit);
+        newStorage.set(i, val);
+      }
+    });
+  } else {
+    limit = Math.ceil(this._limit/2);
+    console.log(limit);
+    newStorage = makeLimitedArray(limit);
+
+    oldStorage.each(function(val) {
+      if (val) {
+        var i = getIndexBelowMaxForKey(val[0], limit);
+        newStorage.set(i, val);
+      }
+    });
+  }
+
+  this._storage = newStorage;
+  this._limit = limit;
+
 };

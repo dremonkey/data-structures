@@ -19,6 +19,7 @@
       list.tail = node;
     } else {
       list.tail.next = node;
+      list.tail.next.prev = list.tail;
       list.tail = list.tail.next;
     }
 
@@ -32,7 +33,7 @@
     var result;
 
     if (list.head === null) {
-      return null
+      return null;
     }
 
     if (list.head === list.tail) {
@@ -68,6 +69,39 @@
     return false;
   };
 
+  list.addToHead = function(value) {
+    var node = makeNode(value);
+
+    if (list.head === null) {
+      list.head = node;
+      list.tail = node;
+    } else {
+      list.head.prev = node;
+      list.head.prev.next = list.head;
+      list.head = list.head.prev;
+    }
+
+  };
+
+  list.removeTail = function() {
+    var result;
+
+    if (!list.tail) {
+      return null;
+    }
+
+    if (list.head === list.tail) {
+      result = list.tail.value;
+      list.head = null;
+      list.tail = null;
+    } else {
+      result = list.tail.value;
+      list.tail =list.tail.prev;
+    }
+
+    return result;
+  };
+
   return list;
 };
 
@@ -75,6 +109,7 @@ var makeNode = function(value){
   var node = {};
   node.value = value;
   node.next = null;
+  node.prev = null;
 
   return node;
 };

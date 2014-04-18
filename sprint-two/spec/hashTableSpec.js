@@ -27,15 +27,20 @@ describe("hashTable", function() {
 
   it("should not contain values that were removed", function() {
     hashTable.insert("Steven", "Tyler");
-    hashTable.remove("Steven");
-    expect(hashTable.retrieve("Steven")).to.equal(null);
+    var v1 = 'val1', v2 = 'val9';
+    hashTable.insert(v1, v1);
+    hashTable.insert(v2, v2);
+    hashTable.remove("val1");
+    expect(hashTable.retrieve("val1")).to.equal(null);
+    expect(hashTable.retrieve('val9')).to.equal('val9');
   });
 
   it("should handle hash function collisions", function(){
     expect(window.getIndexBelowMaxForKey).to.be.ok;
-    var v1 = 'val1', v2 = 'val2';
+    var v1 = 'val1', v2 = 'val9';
     hashTable.insert(v1, v1);
     hashTable.insert(v2, v2);
+    console.log(hashTable.retrieve(v1), hashTable.retrieve(v2));
     expect(hashTable.retrieve(v1)).to.equal(v1);
     expect(hashTable.retrieve(v2)).to.equal(v2);
   });
