@@ -1,85 +1,122 @@
+// Andre smarter solution
+
 var Graph = function(){
-  this._nodeCount = 0;
-  this._nodes = [];
-  this._edges = {};
+ this._nodes = {};
+ this._numOfNodes = 0;
+ this._firstNode = null;
 };
 
 Graph.prototype.addNode = function(newNode, toNode){
+ var node = new Node(newNode);
 
-  if (!toNode && this._nodes.length === 1) {
-    toNode = this._nodes[0];
-  }
+ // add the new node to this._nodes
+ // NOTE this assumes that newNode is unique...
+ // TODO use a hashing function to hash the node object to ensure non-overlapping keys
+ this._nodes[newNode] = node;
 
-  this.addEdge(newNode, toNode);
-  this._nodes.push(newNode);
-  this._nodeCount++
+ // if there is a toNode or there is only one other node in the list
+ // then add a conection between the nodes
+ if (toNode || this._numOfNodes === 1) {
+   toNode = toNode || this._firstNode;
+   this.addEdge(newNode, toNode);
+ }
+
+ // increment numOfNodes
+ this._numOfNodes++;
+
+ // if this is the first node, save it
+ if (this._numOfNodes === 1) {
+   this._firstNode = newNode;
+ }
 };
 
+/**
+* @param node (string) id/key of a node
+*/
 Graph.prototype.contains = function(node){
-  return this._nodes.indexOf(node) !== -1;
+ return this._nodes[node] !== undefined;
 };
 
+/**
+* @param node (string) id/key of a node
+*/
 Graph.prototype.removeNode = function(node){
+ var nodeObj = this._nodes[node];
 
-  // get all edges that node is pointing to
-  var edges = this._edges[node];
+ // remove references to this node from all connected nodes
+ var edges = nodeObj.getEdges();
+ if (edges) {
+   for(var nodeKey in edges) {
+     this.removeEdge(nodeKey, node);
+   }
+ }
 
-  // loop through all attached edges to remove the node to delete
-  if (edges) {
-    for(var i=0; i<edges.length; i++) {
-      if (edges[i] === node) {
-        delete edges[i];
-      }
-    }
-
-    delete this._edges[node];
-  }
-
-
-  // remove the node
-  var index = this._nodes.indexOf(node);
-  if (index !== -1) {
-    delete this._nodes[index];
-    this._nodeCount--;
-  }
+ // after all connections are removed, delete the node
+ delete this._nodes[node];
+ this._numOfNodes--;
 };
 
+/**
+* @param fromNode (string) id/key of a node
+* @param toNode (string) id/key of a node
+*/
 Graph.prototype.getEdge = function(fromNode, toNode){
-  return this._edges[fromNode].indexOf(toNode) !== -1;
+ console.log('Graph.getEdge', fromNode, toNode);
+ var nodeObj = this._nodes[fromNode];
+ return nodeObj.hasEdge(toNode);
 };
 
+/**
+* @param fromNode (string) id/key of a node
+* @param toNode (string) id/key of a node
+*/
 Graph.prototype.addEdge = function(fromNode, toNode){
-  if (toNode) {
-    // ensure bidirectional edges
-    if (this._edges[fromNode]) {
-      this._edges[fromNode].push(toNode);
-    }
-    else {
-      // if tonode exists
-      this._edges[fromNode] = [toNode];
-    }
+ var fromNodeObj = this._nodes[fromNode];
+ var toNodeObj = this._nodes[toNode];
 
-
-    if (this._edges[toNode]) {
-      this._edges[toNode].push(fromNode);
-    }
-    else {
-      this._edges[toNode] = [fromNode];
-    }
-  }
+ fromNodeObj.addEdge(toNode);
+ toNodeObj.addEdge(fromNode);
 };
 
 Graph.prototype.removeEdge = function(fromNode, toNode){
-  var idx1 = this._edges[fromNode].indexOf(toNode);
-  var idx2 = this._edges[toNode].indexOf(fromNode);
+ var fromNodeObj = this._nodes[fromNode];
+ var toNodeObj = this._nodes[toNode];
 
-  delete this._edges[fromNode][idx1];
-  delete this._edges[fromNode][idx2];
+ fromNodeObj.removeEdge(toNode);
+ toNodeObj.removeEdge(fromNode);
 
-  console.log(this._edges);
+ if (!fromNodeObj.hasEdges()) this.removeNode(fromNode);
+ if (!toNodeObj.hasEdges()) this.removeNode(toNode);
 };
 
-// var Node = function (value) {
-//   this._edges = [];
-//   this._value = undefined;
-// }
+var Node = function (value) {
+ this._value = value;
+ this._edges = null;
+ this._numOfEdges = 0;
+};
+
+Node.prototype.hasEdge = function (toNode) {
+ return this._edges[toNode] !== undefined;
+};
+
+Node.prototype.hasEdges = function () {
+ return this._numOfEdges > 0;
+};
+
+Node.prototype.getEdges = function () {
+ return this._edges;
+};
+
+Node.prototype.removeEdge = function (toNode) {
+ if (this._edges[toNode]) {
+   delete this._edges[toNode];
+   this._numOfEdges--;
+ }
+};
+
+Node.prototype.addEdge = function (toNode, distance) {
+ distance = distance || 1; 
+ this._edges = this.edges || {};
+ this._edges[toNode] = distance;
+ this._numOfEdges++;
+};

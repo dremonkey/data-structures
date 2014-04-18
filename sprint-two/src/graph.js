@@ -1,3 +1,5 @@
+// Jon crazy array solution
+
 var Graph = function(){
   this._nodes = []; // Array of Node Values
   this._edges = []; // Array of Edge Objects
