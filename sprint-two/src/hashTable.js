@@ -67,35 +67,48 @@ HashTable.prototype.resize = function (makeLarger) {
   //  if size > 75%, double the size.
   //  if size < 25%, half the size
 
+  var self = this;
   var oldStorage = this._storage;
   var limit;
-  var newStorage;
+  // var newStorage;
 
   // fix for changes in storage structure
   if (makeLarger) {
     limit = this._limit*2;
-    newStorage = makeLimitedArray(limit);
+    // newStorage = makeLimitedArray(limit);
+    // this._storage = newStorage;
+    this._storage = makeLimitedArray(limit);
+    this._limit = limit;
 
     oldStorage.each(function (val, index, collection) {
       if (val && val[index]) {
-        var i = getIndexBelowMaxForKey(val[index][0],limit);
-        newStorage.set(i, val);
+        self.insert(val[index][0], val);
       }
     });
+    // oldStorage.each(function (val, index, collection) {
+    //   if (val && val[index]) {
+    //     var i = getIndexBelowMaxForKey(val[index][0],limit);
+    //     newStorage.set(i, val);
+    //   }
+    // });
   } 
   else {
     limit = Math.ceil(this._limit/2);
-    newStorage = makeLimitedArray(limit);
+    // newStorage = makeLimitedArray(limit);
+    // this._storage = newStorage;
+    this._storage = makeLimitedArray(limit);
+    this._limit = limit;
 
     oldStorage.each(function(val, index, collection) {
       if (val && val[index]) {
-        var i = getIndexBelowMaxForKey(val[index][0], limit);
-        newStorage.set(i, val);
+        self.insert(val[index][0], val);
+        // var i = getIndexBelowMaxForKey(val[index][0], limit);
+        // newStorage.set(i, val);
       }
     });
   }
 
-  this._storage = newStorage;
-  this._limit = limit;
+  // this._storage = newStorage;
+  // this._limit = limit;
 
 };
