@@ -29,7 +29,6 @@ HashTable.prototype.retrieve = function(k){
         if (k === values[count][0]) value = values[count];
       }
     } else {
-      console.log(values[0]);
       if (k === values[0][0]) {
         value = values[0];
       }
@@ -77,20 +76,20 @@ HashTable.prototype.resize = function (makeLarger) {
     limit = this._limit*2;
     newStorage = makeLimitedArray(limit);
 
-    oldStorage.each(function (val) {
-      if (val) {
-        var i = getIndexBelowMaxForKey(val[0],limit);
+    oldStorage.each(function (val, index, collection) {
+      if (val && val[index]) {
+        var i = getIndexBelowMaxForKey(val[index][0],limit);
         newStorage.set(i, val);
       }
     });
-  } else {
+  } 
+  else {
     limit = Math.ceil(this._limit/2);
-    console.log(limit);
     newStorage = makeLimitedArray(limit);
 
-    oldStorage.each(function(val) {
-      if (val) {
-        var i = getIndexBelowMaxForKey(val[0], limit);
+    oldStorage.each(function(val, index, collection) {
+      if (val && val[index]) {
+        var i = getIndexBelowMaxForKey(val[index][0], limit);
         newStorage.set(i, val);
       }
     });
