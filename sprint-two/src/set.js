@@ -4,6 +4,7 @@ var makeSet = function(){
   return set;
 };
 
+// string approach to sets using JS arrays
 var setPrototype = {};
 
 setPrototype.add = function(item){

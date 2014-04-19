@@ -11,6 +11,7 @@ var makeTree = function(value){
 
 var treeMethods = {};
 
+// add child using array
 treeMethods.addChild = function(value){
   var node = makeTree(value);
   if (this.children) {
@@ -21,6 +22,9 @@ treeMethods.addChild = function(value){
   }
 };
 
+// contains uses recursive call for each child node
+// base case: if node.children exists
+// bubbles up: true/false if target is found
 treeMethods.contains = function(target){
   if (this.value === target) return true;
 

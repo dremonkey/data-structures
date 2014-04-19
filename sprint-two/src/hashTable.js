@@ -5,13 +5,18 @@ var HashTable = function(limit){
 };
 
 HashTable.prototype.insert = function(k, v){
+  // get hash key
   var i = getIndexBelowMaxForKey(k, this._limit);
 
+  // create array key, value arrays for the storage
   var value = this._storage.get(i) || [];
   value.push([k,v]);
   this._storage.set(i, value);
+  
+  // keep track of the size of the array
   this._size++;
 
+  //resize if size is more than 75% of limit
   if (this._size >= 0.75*this._limit) {
     this.resize(true);
   }
@@ -23,18 +28,23 @@ HashTable.prototype.retrieve = function(k){
   var value;
   var values = this._storage.get(i);
 
+  // access the storage for the specific key
   if (values) {
+    // when more than one object in buckets
     if (values.length > 1) {
+      // loop through each k/v pair in the bucket
       for(var count=0;count<values.length;count++) {
         if (k === values[count][0]) value = values[count];
       }
     } else {
+      // access
       if (k === values[0][0]) {
         value = values[0];
       }
     }
   }
 
+  // return if value exists and return the value in the k/v pair array
   return value && value[1] || null;
 };
 
@@ -43,10 +53,12 @@ HashTable.prototype.remove = function(k){
 
   var values = this._storage.get(i);
 
+  // remove uses similar approach as retrieve
   if (values) {
     if (values.length > 1) {
       for (var count=values.length-1; count>=0;count--) {
         if (k===values[count][0]) {
+          // uses splice to change the storage array
           values.splice(count,1);
         }
       }
@@ -57,6 +69,7 @@ HashTable.prototype.remove = function(k){
 
   this._size--;
 
+  // resize if too small
   if (this._size < 0.25*this._limit) {
     this.resize(false);
   }

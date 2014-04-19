@@ -79,6 +79,7 @@ makeBinarySearchTree.methods.breadthFirstLog = function (cb) {
 
   toDo.push(this);
 
+  // breadth first search using queue/while loop approach
   while(toDo.length > 0) {
     if (toDo[0].left) {
       toDo.push(toDo[0].left);
