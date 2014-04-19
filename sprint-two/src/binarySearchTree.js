@@ -4,6 +4,7 @@ var makeBinarySearchTree = function(value){
     instance.value = value;
     instance.left = null; // smaller BST
     instance.right = null; // larger BST
+    instance.depth = [0,0];
 
     return instance;
 };
@@ -20,20 +21,22 @@ makeBinarySearchTree.methods.insert = function(value) {
  //   repeat same steps for right
 
   if (value > this.value) {
+    this.depth[1]++;
     if (this.right) {
       this.right.insert(value);
     } else {
       this.right = makeBinarySearchTree(value);
     }
   } else {
+    this.depth[0]++;
     if (this.left) {
       this.left.insert(value);
     } else {
       this.left = makeBinarySearchTree(value);
     }
   }
+  console.log(this);
   return false;
-
 };
 
 makeBinarySearchTree.methods.contains = function(value) {
@@ -69,4 +72,22 @@ makeBinarySearchTree.methods.depthFirstLog = function(cb) {
   if (this.right) this.right.depthFirstLog(cb);
 
   return null;
+};
+
+makeBinarySearchTree.methods.breadthFirstLog = function (cb) {
+  var toDo = [];
+
+  toDo.push(this);
+
+  while(toDo.length > 0) {
+    if (toDo[0].left) {
+      toDo.push(toDo[0].left);
+    }
+    if (toDo[0].right) {
+      toDo.push(toDo[0].right);
+    }
+    cb(toDo[0].value);
+    toDo.shift();
+  }
+
 };
